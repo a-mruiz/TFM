@@ -1,0 +1,22 @@
+#No images allowed
+.png
+
+#No data training
+data_middlebury/
+data_gdem/
+
+#No outputs from training
+outputs/
+
+#No training information
+runs/
+results/
+
+#ignore pyc files
+*.pyc
+
+#ignore cesvima out files
+slurm-*
+
+#ignore __pycache__
+__pycache__/

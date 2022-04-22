@@ -1,0 +1,4 @@
+azureml-dataset-runtime
+azureml
+azureml-core
+pandas

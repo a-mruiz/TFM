@@ -2,7 +2,7 @@ Azure_scripts/config.json
 Depth_inpainting/data_jaime/
 
 #No images allowed
-.png
+*.png
 
 #No data training
 data_middlebury/

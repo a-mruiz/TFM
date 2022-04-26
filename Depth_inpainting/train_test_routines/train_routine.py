@@ -1,8 +1,9 @@
+import copy
 import torch
 import time
 from tqdm import tqdm
 from helpers.helper import save_result_row, save_result_individual
-from torch.profiler import profile, record_function, ProfilerActivity
+#from torch.profiler import profile, record_function, ProfilerActivity
 from pynvml import *
 import torch.nn.functional as F
 import numpy as np
@@ -28,9 +29,9 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
     train_mse=[]
 
     folder_output="outputs/val/inceptionandatt/exp/"
-    
         
     for epoch in range(epochs):
+        azure_run.log('Learning rate',optimizer.param_groups[0]['lr'])
         torch.cuda.empty_cache()
         print("------------EPOCH ("+str(epoch+1) +") of ("+str(epochs)+")------------")
         losses_batch, psnr_batch, gpu_time, mse_batch = train_one_epoch(
@@ -74,7 +75,7 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
                 val_losses.append(val_current_loss)
                 val_psnrs.append(val_current_psnr)
                 val_mses.append(val_current_mse)
-                save_result_row(batch_data, output, "out_"+str(epoch)+"_"+str(i)+".png", folder=folder_output)
+                save_result_row(batch_data, output, "out_"+str(epoch)+"_"+str(i)+".png", folder=folder_output,azure_run=azure_run)
 
             val_mean_loss= sum(val_losses)/len(val_losses)
             val_mean_psnr= -sum(val_psnrs)/len(val_psnrs)
@@ -96,7 +97,8 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
             if val_mean_psnr>latest_psnr:
                 latest_psnr=val_mean_psnr
                 torch.save(model.state_dict(), "model_best.pt")
-                azure_run.upload_file(name="model_best.pt", path_or_stream="model_best.pt")
+                #best_global_model=copy.deepcopy(model)
+                #azure_run.upload_file(name="model_best.pt", path_or_stream="model_best.pt")
                 print(latest_psnr)
             
         lr_scheduler(losses_batch)
@@ -111,6 +113,10 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
     #            y_label="PSNR(dB)", x_lim_low=0, x_lim_high=len(train_psnr), show=False, subtitle="", output_dir=folder_output,x_ticker=5)
     #graph_utils.make_graph([train_mse, val_mse], ['train', 'val'], range(0,len(val_psnr)), title="MSE loss values train&test", x_label="epochs",
     #            y_label="MSE", x_lim_low=0, x_lim_high=len(train_psnr), show=False, subtitle="", output_dir=folder_output,x_ticker=5,y_ticker=y_ticker_mse)
+    
+    azure_run.upload_file(name="model_best.pt",path_or_stream="model_best.pt")
+    
+    
     return model
 
 
@@ -138,14 +144,21 @@ def train_one_epoch(model, optimizer, loader, criterion, logger, epoch,device,wr
         # zero the parameter gradients
         optimizer.zero_grad()        
         # forward + backward + optimize
+        
+        gpu_inference_time=time.time()
         output = model(batch_data)
+        
+        gpu_inference_time=time.time()-gpu_inference_time
+        
+        azure_run.log("GPU time inference (s)",gpu_inference_time)
+        
         loss = criterion(output, batch_data['gt'])
         loss.backward()
         optimizer.step()
 
         gpu_time = time.time()-gpu_time_start
         
-        azure_run.log("GPU time model forward pass (s)",gpu_time)
+        azure_run.log("GPU time forward + backward pass (s)",gpu_time)
         
         #exp_lr_scheduler.step()
         current_loss = loss.item()

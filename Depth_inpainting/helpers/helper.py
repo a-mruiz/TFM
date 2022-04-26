@@ -75,7 +75,7 @@ def save_test_result(batch_data, output, name,folder="outputs/"):
     #print("saving img to "+str(folder+name))
     
     
-def save_result_row(batch_data, output, name, folder="outputs/"):
+def save_result_row(batch_data, output, name, folder="outputs/",azure_run=None):
     """Will save a row with the different images rgb+depth+gt+output
 
     Args:
@@ -130,7 +130,11 @@ def save_result_row(batch_data, output, name, folder="outputs/"):
     img_merge_down = np.hstack([img_list[1], img_list[3]])
     img_merge = np.vstack([img_merge_up, img_merge_down])
     img_merge= img_merge.astype('uint8')
-    save_image_color(img_merge,folder+name)
+    if azure_run:
+        imgplot = plt.imshow(img_merge)
+        azure_run.log_image(name=name,plot=imgplot)
+    else:
+        save_image_color(img_merge,folder+name)
     #print("saving img to "+str(folder+name))
 
 def save_result_individual(img, mode, name, folder="outputs/test/"):

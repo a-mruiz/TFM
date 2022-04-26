@@ -4,7 +4,6 @@ Author:Alejandro
 """
 
 import copy
-from tkinter import W
 import torch
 from dataloaders.MiddleburyDataloaderFile import MiddleburyDataLoader
 from helpers.helper import LRScheduler, Logger
@@ -15,7 +14,7 @@ import time
 from tqdm import tqdm
 from tqdm import trange
 from torch.utils.tensorboard import SummaryWriter
-from torch.profiler import profile, record_function, ProfilerActivity
+#from torch.profiler import profile, record_function, ProfilerActivity
 from train_test_routines.train_routine import train_model, test_model
 from model.external import SelfSup_FangChang_2018, PENet_2021, TWISE_2021
 import sys
@@ -47,6 +46,7 @@ print("===> Using '{}' for computation.".format(device))
 
 
 # The mount point can be retrieved from argument values
+# This value has to be passed to the dataloaders in order to get the correct path of the images
 import sys
 mount_point = sys.argv[1]
 
@@ -54,6 +54,7 @@ mount_point = sys.argv[1]
 run = Run.get_context()
 
 def main():
+    global training_script_loading_time
     full_loading_time = time.time()
     training_script_loading_time = time.time() - training_script_loading_time
     train_or_test = "train"
@@ -65,7 +66,7 @@ def main():
     lr = 0.0001
     weight_decay = 1e-07
     #weight_decay = 0
-    epochs = 30
+    epochs = 15
     params = {"mode": train_or_test, "lr": lr,
               "weight_decay": weight_decay, "epochs": epochs,
               "bs":1}
@@ -85,9 +86,7 @@ def main():
     
     h=1024
     w=1024
-    
-    
-
+  
     
     model.to(device)
     
@@ -146,7 +145,6 @@ def main():
     """
     run.log('Batch Size',  params['bs'])
     run.log('Number of epochs',  epochs)
-    run.log('Learning rate', lr)
     run.log('Weight decay', params["weight_decay"])
     run.log('Model',model_option)
     run.log('Dataset Img Size Height',h)
@@ -161,6 +159,8 @@ def main():
         model_original=copy.deepcopy(model)
         model=train_model(model, epochs, params, optimizer,
                     logger, train_dataloader,test_dataloader, criterion, device,lr_scheduler,writer,run)
+        
+        """
         logger.generateTrainingGraphs()
         model_final=copy.deepcopy(model)
         print("\nComputing loss landscapes...(takes long time...)")
@@ -207,6 +207,7 @@ def main():
         with open('3dLossLandscape.fig.pickle', 'wb') as file:
             pl.dump(fig,file)
         """
+        """
         For loading the figure later->
 
         import pickle
@@ -217,8 +218,8 @@ def main():
             plt.show() # Show the figure, edit it, etc.!
 
         """
-        loss_landscapes_processing_time = time.time() - loss_landscapes_processing_time
-        run.log("Time processing loss landscapes graphs (s)",loss_landscapes_processing_time)
+        #loss_landscapes_processing_time = time.time() - loss_landscapes_processing_time
+        #run.log("Time processing loss landscapes graphs (s)",loss_landscapes_processing_time)
         #torch.save(model.state_dict(), "model_last.pth")
         
         run.register_model(model_path='model_best.pt', model_name="best_model", model_framework='PyTorch', model_framework_version=torch.__version__)

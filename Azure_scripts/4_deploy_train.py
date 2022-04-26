@@ -6,8 +6,6 @@ from azureml.data import FileDataset
 import os
 import shutil
 
-from cv2 import exp
-
 
 # Experiment folder name
 experiment_folder = 'Test_azure_training'
@@ -45,11 +43,11 @@ mount_point = Run.get_context().input_datasets['input_1']
 
 # Create a folder for the experiment files
 try: 
-    os.makedirs(experiment_folder, exist_ok=True)
+    os.makedirs(experiment_folder, exist_ok=False)
     print(experiment_folder, 'folder created')
 except:
     print("\nDirectory already existed, removing and creating new one with the most updated version...")
-    os.rmdir(experiment_folder)
+    shutil.rmtree(experiment_folder)
     os.makedirs(experiment_folder, exist_ok=True)
     print(experiment_folder, 'folder created')
 

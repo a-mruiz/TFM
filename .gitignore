@@ -23,3 +23,6 @@ slurm-*
 
 #ignore __pycache__
 __pycache__/
+
+#ignore Azure test folder
+Test_azure_training/Depth_inpainting/

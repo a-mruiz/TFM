@@ -18,7 +18,7 @@ from torch.utils.tensorboard import SummaryWriter
 from train_test_routines.train_routine import train_model, test_model
 from model.external import SelfSup_FangChang_2018, PENet_2021, TWISE_2021
 import sys
-
+import os
 import loss_landscapes
 import loss_landscapes.metrics
 import matplotlib
@@ -28,6 +28,8 @@ import pickle as pl
 
 # Import Azure SKD for Python packages
 from azureml.core import Run
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
+
 
 sys.path.append("/media/beegfs/home/t588/t588188/.local/lib/python3.9/site-packages") 
 
@@ -49,12 +51,14 @@ print("===> Using '{}' for computation.".format(device))
 # This value has to be passed to the dataloaders in order to get the correct path of the images
 import sys
 mount_point = sys.argv[1]
+use_data_aug = sys.argv[2]
 
 # Get the experiment run context
 run = Run.get_context()
 
 def main():
     global training_script_loading_time
+    global use_data_aug
     full_loading_time = time.time()
     training_script_loading_time = time.time() - training_script_loading_time
     train_or_test = "train"
@@ -66,7 +70,7 @@ def main():
     lr = 0.0001
     weight_decay = 1e-07
     #weight_decay = 0
-    epochs = 15
+    epochs = 30
     params = {"mode": train_or_test, "lr": lr,
               "weight_decay": weight_decay, "epochs": epochs,
               "bs":1}
@@ -97,7 +101,7 @@ def main():
     
     dataloaders_loading_time = time.time()
     
-    dataset = MiddleburyDataLoader('train', augment=True, preprocess_depth=False,h=h,w=w,mount=mount_point)
+    dataset = MiddleburyDataLoader('train', augment=use_data_aug, preprocess_depth=False,h=h,w=w,mount=mount_point)
     dataset_test = MiddleburyDataLoader('test', augment=False, preprocess_depth=False,h=h,w=w,mount=mount_point)
     dataset_option = "Middlebury"
 
@@ -220,9 +224,25 @@ def main():
         """
         #loss_landscapes_processing_time = time.time() - loss_landscapes_processing_time
         #run.log("Time processing loss landscapes graphs (s)",loss_landscapes_processing_time)
-        #torch.save(model.state_dict(), "model_last.pth")
+        torch.save(model.state_dict(), "model_best.pt")
         
         run.register_model(model_path='model_best.pt', model_name="best_model", model_framework='PyTorch', model_framework_version=torch.__version__)
+        
+        print("Saving model and the compressed version to blob storage-> container=containertostoremodels")
+        #This os variable is set up on the compute machine at creation in order to avoid sharing it
+        connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+        # Create the BlobServiceClient object which will be used to create a container client
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        container_name = "conteinertostoremodels"
+        container_client = blob_service_client.get_container_client(container_name)
+        
+        
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob="model_best.pt")
+
+        # Upload the created file
+        with open("model_best.pt", "rb") as data:
+            blob_client.upload_blob(data)        
+        
         run.complete()
 
     elif train_or_test == "test":

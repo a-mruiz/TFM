@@ -2,3 +2,4 @@ azureml-dataset-runtime
 azureml
 azureml-core
 pandas
+azure-storage-blob

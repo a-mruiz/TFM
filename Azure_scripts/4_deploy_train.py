@@ -7,6 +7,9 @@ import os
 import shutil
 
 
+
+use_dataAug=False
+
 # Experiment folder name
 experiment_folder = 'Test_azure_training'
 
@@ -69,7 +72,7 @@ pytorch_packages = CondaDependencies.create(conda_packages=['ipykernel', 'matplo
                                             pip_packages=['azureml-sdk', 'torch', 'tqdm', 'tensorboard', 'torchvision', 'loss-landscapes', 'imageio',
                                                           'filelock', 'kornia', 'log_utils', 'net_utils', 'networks', 'numpy',
                                                           'opencv_python_headless', 'Pillow', 'pytorch_msssim', 'ray',
-                                                          'scikit_learn','pynvml'])
+                                                          'scikit_learn','pynvml', 'azure-storage-blob'])
 
 # Add the dependencies to the environment
 pytorch_env.python.conda_dependencies = pytorch_packages
@@ -91,7 +94,7 @@ pytorch_env.register(workspace=ws)
 # Reference to datasets and the paths where they will be downloaded in the environment
 script_config = ScriptRunConfig(source_directory=experiment_folder,
                                 script="Depth_inpainting/main_train_new.py",
-                                arguments=[dataset_input],
+                                arguments=[dataset_input,use_dataAug],
                                 #arguments=['--gt-data', gt_ds.as_named_input('gtMaps_data').as_download(),
                                 #           '--preProcessed-data', preProcessed_ds.as_named_input(
                                 #               'preProcessed_data').as_download(),

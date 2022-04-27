@@ -75,7 +75,7 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
                 val_losses.append(val_current_loss)
                 val_psnrs.append(val_current_psnr)
                 val_mses.append(val_current_mse)
-                save_result_row(batch_data, output, "out_"+str(epoch)+"_"+str(i)+".png", folder=folder_output,azure_run=azure_run)
+                #save_result_row(batch_data, output, "out_"+str(epoch)+"_"+str(i)+".png", folder=folder_output,azure_run=azure_run)
 
             val_mean_loss= sum(val_losses)/len(val_losses)
             val_mean_psnr= -sum(val_psnrs)/len(val_psnrs)

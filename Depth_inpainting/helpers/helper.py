@@ -131,7 +131,9 @@ def save_result_row(batch_data, output, name, folder="outputs/",azure_run=None):
     img_merge = np.vstack([img_merge_up, img_merge_down])
     img_merge= img_merge.astype('uint8')
     if azure_run:
-        imgplot = plt.imshow(img_merge)
+        imgplot = plt.figure()
+        plt.imshow(img_merge)
+        
         azure_run.log_image(name=name,plot=imgplot)
     else:
         save_image_color(img_merge,folder+name)

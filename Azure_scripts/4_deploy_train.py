@@ -1,4 +1,5 @@
 
+import json
 import azureml.core
 from azureml.core import Workspace, Dataset, Environment, Experiment, ScriptRunConfig,Run
 from azureml.core.conda_dependencies import CondaDependencies
@@ -81,6 +82,9 @@ print(pytorch_env.name, 'defined.')
 # Register the environment
 pytorch_env.register(workspace=ws)
 
+with open('config_blob.json') as json_file:
+    config_blob = json.load(json_file)
+
 
 #*############################
 # * USE ENVIRONMENT TO RUN
@@ -94,7 +98,7 @@ pytorch_env.register(workspace=ws)
 # Reference to datasets and the paths where they will be downloaded in the environment
 script_config = ScriptRunConfig(source_directory=experiment_folder,
                                 script="Depth_inpainting/main_train_new.py",
-                                arguments=[dataset_input,use_dataAug],
+                                arguments=[dataset_input,use_dataAug,config_blob["AZURE_STORAGE_CONNECTION_STRING"]],
                                 #arguments=['--gt-data', gt_ds.as_named_input('gtMaps_data').as_download(),
                                 #           '--preProcessed-data', preProcessed_ds.as_named_input(
                                 #               'preProcessed_data').as_download(),

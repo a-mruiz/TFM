@@ -52,6 +52,8 @@ print("===> Using '{}' for computation.".format(device))
 import sys
 mount_point = sys.argv[1]
 use_data_aug = sys.argv[2]
+blob_conn_string = sys.argv[3]
+
 
 # Get the experiment run context
 run = Run.get_context()
@@ -70,7 +72,7 @@ def main():
     lr = 0.0001
     weight_decay = 1e-07
     #weight_decay = 0
-    epochs = 30
+    epochs = 10
     params = {"mode": train_or_test, "lr": lr,
               "weight_decay": weight_decay, "epochs": epochs,
               "bs":1}
@@ -229,10 +231,10 @@ def main():
         run.register_model(model_path='model_best.pt', model_name="best_model", model_framework='PyTorch', model_framework_version=torch.__version__)
         
         print("Saving model and the compressed version to blob storage-> container=containertostoremodels")
-        #This os variable is set up on the compute machine at creation in order to avoid sharing it
-        connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+
+
         # Create the BlobServiceClient object which will be used to create a container client
-        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        blob_service_client = BlobServiceClient.from_connection_string(blob_conn_string)
         container_name = "conteinertostoremodels"
         container_client = blob_service_client.get_container_client(container_name)
         

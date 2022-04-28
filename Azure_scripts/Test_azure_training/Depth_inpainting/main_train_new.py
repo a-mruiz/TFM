@@ -25,7 +25,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle as pl
-
+from helpers import compression
 # Import Azure SKD for Python packages
 from azureml.core import Run
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
@@ -61,6 +61,7 @@ run = Run.get_context()
 def main():
     global training_script_loading_time
     global use_data_aug
+    global blob_conn_string
     full_loading_time = time.time()
     training_script_loading_time = time.time() - training_script_loading_time
     train_or_test = "train"
@@ -72,7 +73,7 @@ def main():
     lr = 0.0001
     weight_decay = 1e-07
     #weight_decay = 0
-    epochs = 10
+    epochs = 1
     params = {"mode": train_or_test, "lr": lr,
               "weight_decay": weight_decay, "epochs": epochs,
               "bs":1}
@@ -233,17 +234,27 @@ def main():
         print("Saving model and the compressed version to blob storage-> container=containertostoremodels")
 
 
+        blob_config_and_load_time = time.time() 
+        
         # Create the BlobServiceClient object which will be used to create a container client
         blob_service_client = BlobServiceClient.from_connection_string(blob_conn_string)
         container_name = "conteinertostoremodels"
         container_client = blob_service_client.get_container_client(container_name)
-        
         
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="model_best.pt")
 
         # Upload the created file
         with open("model_best.pt", "rb") as data:
             blob_client.upload_blob(data)        
+        
+        blob_config_and_load_time = time.time() -blob_config_and_load_time
+        
+        run.log("Time to connect to blob and upload model uncompressed (s)",blob_config_and_load_time)
+        
+        
+        compression.compress_model("model_best.pt",azure_run=run)
+        
+        
         
         run.complete()
 

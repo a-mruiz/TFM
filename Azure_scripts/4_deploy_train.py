@@ -73,7 +73,7 @@ pytorch_packages = CondaDependencies.create(conda_packages=['ipykernel', 'matplo
                                             pip_packages=['azureml-sdk', 'torch', 'tqdm', 'tensorboard', 'torchvision', 'loss-landscapes', 'imageio',
                                                           'filelock', 'kornia', 'log_utils', 'net_utils', 'networks', 'numpy',
                                                           'opencv_python_headless', 'Pillow', 'pytorch_msssim', 'ray',
-                                                          'scikit_learn','pynvml', 'azure-storage-blob'])
+                                                          'scikit_learn','pynvml', 'azure-storage-blob','git+https://github.com/fraunhoferhhi/DeepCABAC.git'])
 
 # Add the dependencies to the environment
 pytorch_env.python.conda_dependencies = pytorch_packages
@@ -122,4 +122,4 @@ script_config = ScriptRunConfig(source_directory=experiment_folder,
 # submit the experiment
 experiment = Experiment(workspace=ws, name="Experiment_1")
 run = experiment.submit(config=script_config)
-run.wait_for_completion(show_output=True)
+#run.wait_for_completion(show_output=True)

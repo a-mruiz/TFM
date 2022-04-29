@@ -38,12 +38,18 @@ jobs:
           json: ${{ secrets.secret_json_blob }}
           dir: 'Azure_scripts/'
         # AML Workspace Action
-      - uses: Azure/aml-workspace@v1
-        id: aml_workspace
-        # required inputs as secrets
+      # - uses: Azure/aml-workspace@v1
+      #   id: aml_workspace
+      #   # required inputs as secrets
+      #   with:
+      #     # required
+      #     azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to azure
+        uses: azure/login@v1
         with:
-          # required
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: $ {{secrets.AZURE_CREDENTIALS}}
+
       - name: execute training deployment
         working-directory: ./Azure_scripts
         run: 

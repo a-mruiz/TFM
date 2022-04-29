@@ -38,7 +38,10 @@ jobs:
           name: "config_blob.json"
           json: ${{ secrets.secret_json_blob }}
           dir: 'Azure_scripts/'
-
+      - name: Login via Az module
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
       - name: execute training deployment
         working-directory: ./Azure_scripts
         run: 

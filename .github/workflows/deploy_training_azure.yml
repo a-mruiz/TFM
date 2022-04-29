@@ -50,13 +50,13 @@ jobs:
       #     # required
       #     azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       #- uses: elstudio/action-install-azure-cli@v1
-      - name: test login 
-        run:
-          az login --debug
-      # - name: Login to azure
-      #   uses: azure/login@v1.4.3
-      #   with:
-      #     creds: $ {{secrets.AZURE_CREDENTIALS}}
+      #- name: test login 
+      #  run:
+      #    az login --debug
+      - name: Login to azure
+        uses: azure/login@v1.4.3
+        with:
+          creds: $ {{secrets.AZURE_CREDENTIALS}}
 
       - name: execute training deployment
         working-directory: ./Azure_scripts

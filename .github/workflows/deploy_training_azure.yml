@@ -49,10 +49,10 @@ jobs:
       #   with:
       #     # required
       #     azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-      - uses: elstudio/action-install-azure-cli@v1
+      #- uses: elstudio/action-install-azure-cli@v1
       - name: test login 
         run:
-          az login -i
+          az login --debug
       # - name: Login to azure
       #   uses: azure/login@v1.4.3
       #   with:

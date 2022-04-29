@@ -13,6 +13,12 @@ import shutil
 #                                     service_principal_id="your-client-id", # clientId
 #                                     service_principal_password="your-client-secret") # clientSecret 
 
+
+from azureml.core.authentication import AzureCliAuthentication
+
+cli_auth = AzureCliAuthentication()
+
+
 use_dataAug=False
 
 # Experiment folder name
@@ -23,7 +29,14 @@ exp_number = '1'
 
 
 # Load the workspace from the saved config file
-ws = Workspace.from_config()
+ws = Workspace.from_config(auth=cli_auth)
+
+
+#ws = Workspace(subscription_id="my-subscription-id",
+#               resource_group="my-ml-rg",
+#               workspace_name="my-ml-workspace",
+#               auth=cli_auth)
+
 print('Ready to use Azure ML {} to work with {}'.format(
     azureml.core.VERSION, ws.name))
 compute_instance_name="tfm-compute-instance"

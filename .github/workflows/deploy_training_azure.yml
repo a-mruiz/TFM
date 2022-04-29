@@ -12,11 +12,11 @@ jobs:
       - name: checkout repo content
         uses: actions/checkout@v3 # checkout the repository content to github runner
         # Connect or Create the Azure Machine Learning Workspace
-      - name: Connect Azure Machine Learning Workspace
-        id: aml_workspace
-        uses: Azure/aml-workspace@v1
-        with:
-            azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+      #- name: Connect Azure Machine Learning Workspace
+      #  id: aml_workspace
+      #  uses: Azure/aml-workspace@v1
+      #  with:
+      #      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       - name: setup python
         uses: actions/setup-python@v2
         with:

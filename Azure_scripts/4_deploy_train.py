@@ -7,7 +7,11 @@ from azureml.data import FileDataset
 import os
 import shutil
 
+# from azureml.core.authentication import ServicePrincipalAuthentication
 
+# sp = ServicePrincipalAuthentication(tenant_id="your-tenant-id", # tenantID
+#                                     service_principal_id="your-client-id", # clientId
+#                                     service_principal_password="your-client-secret") # clientSecret 
 
 use_dataAug=False
 

@@ -55,5 +55,4 @@ jobs:
         working-directory: ./Azure_scripts
         run: 
           python3 4_deploy_train.py
-        
-        
+      

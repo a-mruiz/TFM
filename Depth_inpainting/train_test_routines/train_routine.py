@@ -11,7 +11,7 @@ import imageio
 import helpers.losses as losses
 from helpers import graph_utils
 
-def train_model(model, epochs, params, optimizer, logger, loader, loader_val, criterion, device, lr_scheduler,writer,azure_run):
+def train_model(model, epochs, params, optimizer, logger, loader, loader_val, criterion, device, lr_scheduler,writer,azure_run=None):
     """
     Train the model 
     """

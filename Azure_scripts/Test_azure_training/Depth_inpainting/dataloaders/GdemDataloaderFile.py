@@ -12,7 +12,7 @@ import torch
 import torch.utils.data as data
 import cv2
 from torchvision import transforms
-from test_occlusions_removal import slow_remove_occlusions
+from dataloaders.occlusions_removal import slow_remove_occlusions
 
 def read_rgb(path):
     rgb=cv2.imread(path)

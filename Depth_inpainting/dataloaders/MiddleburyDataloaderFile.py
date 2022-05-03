@@ -14,9 +14,8 @@ import cv2
 from torchvision import transforms
 from dataloaders.data_augmentation import DataAugmentation
 #from dataloaders.data_augmentation import DataAugmentation,DataAugmentation_Albu
-from test_occlusions_removal import slow_remove_occlusions
+from dataloaders.occlusions_removal import slow_remove_occlusions
 import random
-
 
 def read_rgb(path):
     #rgb=np.array(cv2.imread(path))/255.0

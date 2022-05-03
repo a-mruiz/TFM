@@ -31,7 +31,8 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
     folder_output="outputs/val/inceptionandatt/exp/"
         
     for epoch in range(epochs):
-        azure_run.log('Learning rate',optimizer.param_groups[0]['lr'])
+        if azure_run!=None:
+            azure_run.log('Learning rate',optimizer.param_groups[0]['lr'])
         torch.cuda.empty_cache()
         print("------------EPOCH ("+str(epoch+1) +") of ("+str(epochs)+")------------")
         losses_batch, psnr_batch, gpu_time, mse_batch = train_one_epoch(
@@ -44,10 +45,11 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
         train_psnr.append(psnr_batch)
         train_mse.append(mse_batch)
         
-        #log values to azure ml cloud
-        azure_run.log("Train Loss",losses_batch)
-        azure_run.log("Train PSNR(dB)",psnr_batch)
-        azure_run.log("Train MSE",mse_batch)
+        if azure_run!=None:
+            #log values to azure ml cloud
+            azure_run.log("Train Loss",losses_batch)
+            azure_run.log("Train PSNR(dB)",psnr_batch)
+            azure_run.log("Train MSE",mse_batch)
         
         #"""log all the training!!!"""
         #writer.add_scalar("Train Loss- EPOCH", sum(losses_batch)/len(losses_batch))
@@ -76,7 +78,8 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
                 val_psnrs.append(val_current_psnr)
                 val_mses.append(val_current_mse)
                 #save_result_row(batch_data, output, "out_"+str(epoch)+"_"+str(i)+".png", folder=folder_output,azure_run=azure_run)
-
+                save_result_row(batch_data, output, "out_"+str(epoch)+"_"+str(i)+".png", folder=folder_output,azure_run=azure_run)
+            
             val_mean_loss= sum(val_losses)/len(val_losses)
             val_mean_psnr= -sum(val_psnrs)/len(val_psnrs)
             val_mean_mse= sum(val_mses)/len(val_mses)
@@ -85,11 +88,12 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
             val_mse.append(val_mean_mse)
             val_psnr.append(val_mean_psnr)
             
-            #log values to azureml cloud
-            azure_run.log("Validation Loss",val_mean_loss)
-            azure_run.log("Validation PSNR(dB)",val_mean_psnr)
-            azure_run.log("Validation MSE",val_mean_mse)
-            
+            if azure_run!=None:
+                #log values to azureml cloud
+                azure_run.log("Validation Loss",val_mean_loss)
+                azure_run.log("Validation PSNR(dB)",val_mean_psnr)
+                azure_run.log("Validation MSE",val_mean_mse)
+                
             #writer.add_scalar("Val Loss- EPOCH", sum(losses_batch)/len(losses_batch))
             #writer.add_scalar("Val PSNR(dB)- EPOCH", -sum(psnr_batch)/len(psnr_batch))
             logger.logToFile(epoch, losses_batch, -psnr_batch, gpu_time)
@@ -102,19 +106,19 @@ def train_model(model, epochs, params, optimizer, logger, loader, loader_val, cr
                 print(latest_psnr)
             
         lr_scheduler(losses_batch)
-    
-    #y_ticker=(max(train_loss)-min(train_loss))/10
-    #
-    #y_ticker_mse=(max(train_mse)-min(train_mse))/10
-    #
-    #graph_utils.make_graph([train_loss, val_loss], ['train', 'val'], range(0,len(train_loss)), title="Loss values train&test", x_label="epochs",
-    #                    y_label="Loss", x_lim_low=0, x_lim_high=len(train_loss), show=False, subtitle="", output_dir=folder_output,x_ticker=5,y_ticker=y_ticker)
-    #graph_utils.make_graph([train_psnr, val_psnr], ['train', 'val'], range(0,len(val_psnr)), title="PSNR values train&test", x_label="epochs",
-    #            y_label="PSNR(dB)", x_lim_low=0, x_lim_high=len(train_psnr), show=False, subtitle="", output_dir=folder_output,x_ticker=5)
-    #graph_utils.make_graph([train_mse, val_mse], ['train', 'val'], range(0,len(val_psnr)), title="MSE loss values train&test", x_label="epochs",
-    #            y_label="MSE", x_lim_low=0, x_lim_high=len(train_psnr), show=False, subtitle="", output_dir=folder_output,x_ticker=5,y_ticker=y_ticker_mse)
-    
-    azure_run.upload_file(name="model_best.pt",path_or_stream="model_best.pt")
+    if azure_run==None:
+        y_ticker=(max(train_loss)-min(train_loss))/10
+        
+        y_ticker_mse=(max(train_mse)-min(train_mse))/10
+        
+        graph_utils.make_graph([train_loss, val_loss], ['train', 'val'], range(0,len(train_loss)), title="Loss values train&test", x_label="epochs",
+                            y_label="Loss", x_lim_low=0, x_lim_high=len(train_loss), show=False, subtitle="", output_dir=folder_output,x_ticker=5,y_ticker=y_ticker)
+        graph_utils.make_graph([train_psnr, val_psnr], ['train', 'val'], range(0,len(val_psnr)), title="PSNR values train&test", x_label="epochs",
+                    y_label="PSNR(dB)", x_lim_low=0, x_lim_high=len(train_psnr), show=False, subtitle="", output_dir=folder_output,x_ticker=5)
+        graph_utils.make_graph([train_mse, val_mse], ['train', 'val'], range(0,len(val_psnr)), title="MSE loss values train&test", x_label="epochs",
+                    y_label="MSE", x_lim_low=0, x_lim_high=len(train_psnr), show=False, subtitle="", output_dir=folder_output,x_ticker=5,y_ticker=y_ticker_mse)
+    if azure_run!=None:
+        azure_run.upload_file(name="model_best.pt",path_or_stream="model_best.pt")
     
     
     return model
@@ -138,7 +142,8 @@ def train_one_epoch(model, optimizer, loader, criterion, logger, epoch,device,wr
             key: val.to(device) for key, val in batch_data.items() if val is not None
         }
         data_time = time.time() - data_start
-        azure_run.log("Data loading time for model inference (s)",data_time)
+        if azure_run!=None:
+            azure_run.log("Data loading time for model inference (s)",data_time)
         gpu_time_start = time.time()
 
         # zero the parameter gradients
@@ -150,7 +155,8 @@ def train_one_epoch(model, optimizer, loader, criterion, logger, epoch,device,wr
         
         gpu_inference_time=time.time()-gpu_inference_time
         
-        azure_run.log("GPU time inference (s)",gpu_inference_time)
+        if azure_run!=None:
+            azure_run.log("GPU time inference (s)",gpu_inference_time)
         
         loss = criterion(output, batch_data['gt'])
         loss.backward()
@@ -158,7 +164,8 @@ def train_one_epoch(model, optimizer, loader, criterion, logger, epoch,device,wr
 
         gpu_time = time.time()-gpu_time_start
         
-        azure_run.log("GPU time forward + backward pass (s)",gpu_time)
+        if azure_run!=None:
+            azure_run.log("GPU time forward + backward pass (s)",gpu_time)
         
         #exp_lr_scheduler.step()
         current_loss = loss.item()

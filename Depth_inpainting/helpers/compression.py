@@ -5,9 +5,7 @@ from tqdm import tqdm
 import os
 
 
-
-
-def compress_model(weights_path,map_location=torch.device("cpu"),compressed_saving_path="weights.bin",azure_run=None,interv=0.1,stepsize=2**(-0.5*15),stepsize_other=2**(-0.5*19),_lambda=0):
+def compress_model(weights_path,map_location=torch.device("cpu"),compressed_saving_path="weights.bin",azure_run=None,interv=0.1,stepsize=2**(-0.5*15),stepsize_other=2**(-0.5*19),_lambda=0.):
     """Compress model using DeepCABAC to produce a binary file
 
     Args:
@@ -21,10 +19,11 @@ def compress_model(weights_path,map_location=torch.device("cpu"),compressed_savi
         _lambda (int, optional): _description_. Defaults to 0.
     """
     print("Compressing model using DeepCABAC...")
-    weights=torch.load(weights_path,map_location=map_location)
+    weights=torch.load(weights_path,map_location=map_location)    
     encoder=deepCABAC.Encoder()
     
     enc_time=time.time()
+    
     
     for name, param in tqdm(weights.items()):
         if '.num_batches_tracked' in name:

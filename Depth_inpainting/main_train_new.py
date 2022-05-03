@@ -236,6 +236,10 @@ def main():
 
         blob_config_and_load_time = time.time() 
         
+        blob_conn_string = blob_conn_string.replace("\\", "")
+        
+        #print("Connecting to->"+str(blob_conn_string))
+        
         # Create the BlobServiceClient object which will be used to create a container client
         blob_service_client = BlobServiceClient.from_connection_string(blob_conn_string)
         container_name = "conteinertostoremodels"
@@ -245,7 +249,7 @@ def main():
 
         # Upload the created file
         with open("model_best.pt", "rb") as data:
-            blob_client.upload_blob(data)        
+            blob_client.upload_blob(data,overwrite=True)        
         
         blob_config_and_load_time = time.time() -blob_config_and_load_time
         

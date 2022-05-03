@@ -258,7 +258,11 @@ def main():
         
         compression.compress_model("model_best.pt",azure_run=run)
         
-        
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob="model_best_compressed.bin")
+
+        # Upload the created file
+        with open("weights.bin", "rb") as data:
+            blob_client.upload_blob(data,overwrite=True)      
         
         run.complete()
 

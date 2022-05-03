@@ -24,13 +24,11 @@ def compress_model(weights_path,map_location=torch.device("cpu"),compressed_savi
     
     enc_time=time.time()
     
-    print("loaded compressed")
-    print(weights)
+    
     for name, param in tqdm(weights.items()):
         if '.num_batches_tracked' in name:
             continue
         param = param.cpu().numpy()
-        print("hola!")
         if '.weight' in name:
             encoder.encodeWeightsRD(param, interv, stepsize, _lambda)
         else:

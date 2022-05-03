@@ -86,7 +86,7 @@ def main():
     lr = 0.0001
     weight_decay = 1e-07
     #weight_decay = 0
-    epochs = 1
+    epochs = 30
     params = {"mode": train_or_test, "lr": lr,
               "weight_decay": weight_decay, "epochs": epochs,
               "bs":1}
@@ -94,8 +94,8 @@ def main():
     """#1. Load the model"""
     print("===> Loading model...")
     model_loading_time = time.time()
-    model = models.InceptionAndAttentionModel_3()
-    model_option = "InceptionLikeModelDeeper"
+    model = models.SelfAttentionCBAM()
+    model_option = "SelfAttentionCBAM"
     params['model']=model_option
     
     writer = SummaryWriter(log_dir="runs/FAILED/",comment=f'')
@@ -177,7 +177,7 @@ def main():
     if train_or_test == "train":
         model_original=copy.deepcopy(model)
         model=train_model(model, epochs, params, optimizer,
-                    logger, train_dataloader,test_dataloader, criterion, device,lr_scheduler,writer,azure_run=None)
+                    logger, train_dataloader,test_dataloader, criterion, device,lr_scheduler,writer,azure_run=run)
         
         if not train_azure:            
             logger.generateTrainingGraphs()

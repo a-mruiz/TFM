@@ -1,6 +1,9 @@
 Azure_scripts/config.json
 Depth_inpainting/data_jaime/
 
+#in general, no jso
+*.json
+
 #No images allowed
 *.png
 

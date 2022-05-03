@@ -1,0 +1,6 @@
+azureml-core
+azure-storage-blob
+torch
+torchvision
+kornia
+tqdm

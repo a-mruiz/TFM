@@ -7,7 +7,6 @@ import glob
 import numpy as np
 from PIL import Image
 import os
-from pyrsistent import v
 import torch
 import torch.utils.data as data
 import cv2

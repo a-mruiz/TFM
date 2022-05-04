@@ -10,25 +10,11 @@ import kornia.losses as k_losses
 import torch.nn.functional as F
 import torchvision.transforms as transforms
 from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
-from loss_landscapes.metrics.metric import Metric
-from loss_landscapes.model_interface.model_parameters import rand_u_like
-from loss_landscapes.model_interface.model_wrapper import ModelWrapper
+
 psnr_loss=k_losses.PSNRLoss(1)
 
 MSE=nn.MSELoss()
 
-
-
-class LossForLandscape(Metric):
-    """ Computes the loss for the loss-landscapes library to plot later the landscape """
-    def __init__(self, loss_fn, inputs: torch.Tensor, target: torch.Tensor):
-        super().__init__()
-        self.loss_fn = loss_fn
-        self.inputs = inputs
-        self.target = target
-
-    def __call__(self, model_wrapper: ModelWrapper) -> float:
-        return self.loss_fn(model_wrapper.forward(self.inputs), self.target).item()
 
 
 class CombinedNewForLossLandscape(nn.Module):

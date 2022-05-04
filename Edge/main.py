@@ -51,8 +51,8 @@ def main():
     #Download the weights for the model
     download_weights()
     #Decompress the weights
-    model_1=models.SelfAttentionCBAM()
-    model_2=models.SelfAttentionCBAM()
+    model_1=models.SelfAttentionCBAM().to(device)
+    model_2=models.SelfAttentionCBAM().to(device)
     
     #load weights in normal way
     load_state_dict_time=time.time()
@@ -62,10 +62,10 @@ def main():
     #decompress and load compressed weights
     model_compressed,_=helper.decode_model_weights(model_2)    
     
-    helper.test_model(model_compressed,device)
+    
     helper.test_model(model_1,device, " normal ")
 
-    
+    helper.test_model(model_compressed,device)
     
 
 if __name__=="__main__":

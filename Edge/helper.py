@@ -27,7 +27,7 @@ class BlobHelper():
         print("Downloading model...")
         ini_time=time.time()
         blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob="model_best.pt")
-        with open("weights.pt", "wb") as download_file:
+        with open("weights/weights.pt", "wb") as download_file:
             download_file.write(blob_client.download_blob().readall())
         end_time=time.time()-ini_time
         print("OK")
@@ -39,7 +39,7 @@ class BlobHelper():
         print("Downloading compressed model...")
         ini_time=time.time()
         blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob="model_best_compressed.bin")
-        with open("compressed_weights.bin", "wb") as download_file:
+        with open("weights/compressed_weights.bin", "wb") as download_file:
             download_file.write(blob_client.download_blob().readall())
         end_time=time.time()-ini_time
         print("OK")

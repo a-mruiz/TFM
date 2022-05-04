@@ -2907,77 +2907,76 @@ class SelfAttentionCBAM(nn.Module):
         return self.final_sigmoid(out) 
         
         
-
-class SelfAttentionModelCBAM(nn.Module):
-    def __init__(self,attLayers=4,deconvLayers=3,attentionChannels=64):
-        super(SelfAttentionModelCBAM, self).__init__()
-        self.deconvLayers=deconvLayers
-        self.attLayers=attLayers
-        out_channels=int(attentionChannels/2)
-
+class InceptionAndAttentionModel_4CBAM(nn.Module):
+    def __init__(self):
+        super(InceptionAndAttentionModel_4CBAM, self).__init__()
+        
         #Encoder RGB
-        self.first_layer_rgb=conv3x3_relu(in_channels=3,kernel_size=3,out_channels=out_channels,stride=1, padding=1)#B,32,256,512
+        self.first_layer_rgb=conv3x3_relu(in_channels=3,kernel_size=3,out_channels=32,stride=2, padding=1)#B,32,800,800
         #Encoder Depth
-        self.first_layer_depth=conv3x3_relu(in_channels=1,kernel_size=3,out_channels=out_channels,stride=1, padding=1)#B,16,516,1028
+        self.first_layer_depth=conv3x3_relu(in_channels=1,kernel_size=3,out_channels=32,stride=2, padding=1)#B,32,800,800
+             
+        self.conv_intermediate=conv3x3_relu(in_channels=64,kernel_size=3,out_channels=64,stride=2, padding=1)
+        
+        self.inception_1=inceptionBlock_light(in_channels=64,ch1x1=32,ch3x3=64,ch5x5=32,ch3x3_in=32,ch5x5_in=16,pool_proj=32) #128
+        #self.inception_2=inceptionBlock_light(in_channels=128,ch1x1=64,ch3x3=128,ch5x5=64,ch3x3_in=64,ch5x5_in=32) #256
+        self.conv_intermediate_2=conv3x3_relu(in_channels=128,kernel_size=3,out_channels=256,stride=2, padding=1)
+        
+        self.att_1=CBAM(256)
+        self.att_2=CBAM(256)
+        
+        self.conv_intermediate_3=deconv3x3_relu_no_artifacts(in_channels=256, out_channels=128,padding=1, stride=1,output_padding=1, scale_factor=2)
+        
+        self.inception_2=inceptionBlock_light(in_channels=128,ch1x1=64,ch3x3=128,ch5x5=64,ch3x3_in=64,ch5x5_in=32,pool_proj=64) #256
+        self.inception_3=inceptionBlock_light(in_channels=256,ch1x1=128,ch3x3=256,ch5x5=128,ch3x3_in=128,ch5x5_in=64,pool_proj=128) #512
         
         
-        #Self-attention
-        #self.modules_attention=[]
-        #for att in range(attLayers):
-        #    self.modules_attention.append(DIYSelfAttention(attentionChannels))
-        self.att_1=CBAM(attentionChannels)
-        if attLayers==2:
-            self.att_2=CBAM(attentionChannels)
-        if attLayers==3:
-            self.att_2=CBAM(attentionChannels)
-            self.att_3=CBAM(attentionChannels)
-        if attLayers==4:
-            self.att_2=CBAM(attentionChannels)
-            self.att_3=CBAM(attentionChannels)
-            self.att_4=CBAM(attentionChannels)    
-        if deconvLayers==1:
-            self.dec_1=deconv3x3_relu_no_artifacts(in_channels=attentionChannels, out_channels=1,padding=1, stride=1,output_padding=1, scale_factor=1,relu=False)#B,1,512,1024
-        if deconvLayers==2:
-            self.dec_1=deconv3x3_relu_no_artifacts(in_channels=attentionChannels, out_channels=out_channels,padding=1, stride=1,output_padding=1, scale_factor=1)
-            self.dec_2=deconv3x3_relu_no_artifacts(in_channels=out_channels, out_channels=1,padding=1, stride=1,output_padding=1, scale_factor=1,relu=False)
-        if deconvLayers==3:
-            self.dec_1=deconv3x3_relu_no_artifacts(in_channels=attentionChannels, out_channels=out_channels,padding=1, stride=1,output_padding=1, scale_factor=1)
-            self.dec_2=deconv3x3_relu_no_artifacts(in_channels=out_channels, out_channels=int(out_channels/2),padding=1, stride=1,output_padding=1, scale_factor=1)
-            self.dec_3=deconv3x3_relu_no_artifacts(in_channels=int(out_channels/2), out_channels=1,padding=1, stride=1,output_padding=1, scale_factor=1,relu=False)
-            
+        self.dec_0=deconv3x3_relu_no_artifacts(in_channels=512, out_channels=256,padding=1, stride=1,output_padding=1, scale_factor=2)
+        self.dec_1=deconv3x3_relu_no_artifacts(in_channels=256, out_channels=128,padding=1, stride=1,output_padding=1, scale_factor=2)
+        self.dec_2=deconv3x3_relu_no_artifacts(in_channels=128, out_channels=64,padding=1, stride=1,output_padding=1, scale_factor=1)
+        self.dec_3=deconv3x3_relu_no_artifacts(in_channels=64, out_channels=64,padding=1, stride=1,output_padding=1, scale_factor=1)
+        self.dec_4=deconv3x3_relu_no_artifacts(in_channels=64, out_channels=32,padding=1, stride=1,output_padding=1, scale_factor=1)
+
+        self.dec_5_res=conv3x3(in_channels=32,out_channels=2,bias=True)
+           
         self.final_sigmoid=nn.Sigmoid()
         
     def forward(self,input):
         rgb = input['rgb']
-        gray = input['g']
         d = input['d']
 
-        #Rgb branch
+        #init branch
         encoder_feature_init_rgb=self.first_layer_rgb(rgb)
-
         encoder_feature_init_depth=self.first_layer_depth(d)
 
         #Join both representations
         out=torch.cat((encoder_feature_init_rgb,encoder_feature_init_depth),1)
+        out=self.conv_intermediate(out)
         
-        #Attention layers
+        out_i=self.inception_1(out)
+        out=self.conv_intermediate_2(out_i)
+        
         out=self.att_1(out)
-        if self.attLayers==2:
-            out=self.att_2(out)
-        if self.attLayers==3:
-            out=self.att_2(out)
-            out=self.att_3(out)
-        if self.attLayers==4:
-            out=self.att_2(out)
-            out=self.att_3(out)
-            out=self.att_4(out)
-            
+        out=self.att_2(out)
+        
+        out=self.conv_intermediate_3(out)
+        #print(f' {out.shape}+{out_i.shape} ')
+        out_improv=out+out_i
+        #print(f'= {out_improv}')
+        out=self.inception_2(out_improv)
+        out=self.inception_3(out)
         #Decoder
+        out=self.dec_0(out)
         out=self.dec_1(out)
-        if self.deconvLayers==2:
-            out=self.dec_2(out)
-        if self.deconvLayers==3:
-            out=self.dec_2(out)
-            out=self.dec_3(out)
-                
+        out=self.dec_2(out)
+        out=self.dec_3(out)
+        out=self.dec_4(out)
+        out=self.dec_5_res(out)
+        
+        depth=out[:, 0:1, :, :]
+        confidence=out[:, 1:2, :, :]
+
+        out=depth*confidence
+        
+        
         return self.final_sigmoid(out) 

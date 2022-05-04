@@ -1,7 +1,7 @@
 Azure_scripts/config.json
 Depth_inpainting/data_jaime/
 
-#in general, no jso
+#in general, no json
 *.json
 
 #No images allowed
@@ -30,3 +30,4 @@ __pycache__/
 #ignore Azure test folder
 Test_azure_training/Depth_inpainting/
 Azure_scripts/config_blob.json
+Edge/config_blob.json

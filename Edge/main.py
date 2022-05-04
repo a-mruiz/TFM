@@ -10,6 +10,9 @@ from json.tool import main
 import helper
 
 def download_weights():
+    """
+    Download the weights of the model and retrieves time statistics and compression ratio
+    """
     with open('config_blob.json') as json_file:
         config_blob = json.load(json_file)
 
@@ -38,5 +41,5 @@ def main():
     
     
 
-if __name__==main:
+if __name__=="__main__":
     main()

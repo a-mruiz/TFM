@@ -4,7 +4,11 @@ import deepCABAC
 import numpy as np
 from tqdm import tqdm
 import torch
+import cv2
+from PIL import Image
 
+from model.dataloader import MiddleburyDataLoader
+from model import losses
 class BlobHelper():
     """Class to help the interface with Azure Blob Storage
     """
@@ -57,10 +61,10 @@ def decode_model_weights(model):
         PyTorchModel: model with loaded weights
         float: elapsed time to decompress and load weights (s)
     """
-    print("Loading decoder...")
+    print("\nLoading decoder...")
     ini_time=time.time()
     decoder = deepCABAC.Decoder()
-    with open('compressed_weights.bin', 'rb') as f:
+    with open('weights/compressed_weights.bin', 'rb') as f:
         stream = f.read()
     decoder.getStream(np.frombuffer(stream, dtype=np.uint8))
     state_dict = model.state_dict()
@@ -76,5 +80,43 @@ def decode_model_weights(model):
     model.load_state_dict(state_dict)
     end_time=time.time()-ini_time
     print("OK")
+    print("Time taken to decode and load weights (s)->"+str(end_time))
     return model,end_time    
     
+   
+def test_model(model,device,tag=" compressed "):
+    print("\nLoading data to eval...")
+    pre_time=time.time()
+    model.eval()
+    criterion = losses.CombinedNew()
+    #loading data to test
+    dataset_test = MiddleburyDataLoader()
+    test_dataloader = torch.utils.data.DataLoader(
+        dataset_test,
+        batch_size=1,
+        shuffle=False,
+        num_workers=10,
+        pin_memory=True,
+        sampler=None)
+    psnr_list=[]
+    loss_list=[]
+    #inference
+    print("Inference over"+str(tag)+" ...")
+    for i, batch_data in enumerate(test_dataloader):
+        batch_data = {
+            key: val.to(device) for key, val in batch_data.items() if val is not None
+        }
+        pre_time=time.time()-pre_time
+        inf_time=time.time()
+        output = model(batch_data)
+        inf_time=time.time()-inf_time
+        current_psnr = -losses.psnr_loss(output, batch_data['gt']).item()
+        psnr_list.append(current_psnr)
+        loss = criterion(output, batch_data['gt']).item()
+        loss_list.append(loss)
+    print("Mean loss"+tag+": "+str(sum(loss_list)/len(loss_list)))
+    print("Mean PSNR"+tag+ ": "+str(sum(psnr_list)/len(psnr_list)))
+    print(f'Loading time ({pre_time}) and inference time ({inf_time}) (s)')
+    #calculate loss
+    
+    #measure time

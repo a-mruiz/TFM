@@ -8,6 +8,24 @@
 import json
 from json.tool import main
 import helper
+from model import models 
+import time
+import torch
+
+
+
+cuda = torch.cuda.is_available()
+if cuda:
+    import torch.backends.cudnn as cudnn
+    #cudnn.benchmark = True
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
+print("===> Using '{}' for computation.".format(device))
+
+
+
+
 
 def download_weights():
     """
@@ -33,11 +51,20 @@ def main():
     #Download the weights for the model
     download_weights()
     #Decompress the weights
+    model_1=models.SelfAttentionCBAM()
+    model_2=models.SelfAttentionCBAM()
     
+    #load weights in normal way
+    load_state_dict_time=time.time()
+    model_1.load_state_dict(torch.load("weights/weights.pt", map_location=device))
+    load_state_dict_time=time.time()-load_state_dict_time
+    print("\nTime loading model uncompressed (s)->"+str(load_state_dict_time))
+    #decompress and load compressed weights
+    model_compressed,_=helper.decode_model_weights(model_2)    
     
-    
-    
-    
+    helper.test_model(model_compressed,device)
+    helper.test_model(model_1,device, " normal ")
+
     
     
 

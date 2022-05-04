@@ -95,8 +95,8 @@ def test_model(model,device,tag=" compressed "):
         dataset_test,
         batch_size=1,
         shuffle=False,
-        num_workers=10,
-        pin_memory=True,
+        num_workers=2,
+        pin_memory=False,
         sampler=None)
     psnr_list=[]
     loss_list=[]

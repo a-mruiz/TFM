@@ -66,19 +66,12 @@ class BlobHelper():
 
 
 
-<<<<<<< HEAD
 def decode_model_weights(model,weigths_path='weights/compressed_weights.bin'):
-=======
-def decode_model_weights(model):
->>>>>>> 1d10e518bcd816964a20c5021a8f88c760a9eff9
     """Receives a PyTorch model and outputs the same model with weights assigned and the time taken to do it
 
     Args:
         model (PyTorchModel): model
-<<<<<<< HEAD
         weights_path (str): path to the model
-=======
->>>>>>> 1d10e518bcd816964a20c5021a8f88c760a9eff9
 
     Returns:
         PyTorchModel: model with loaded weights
@@ -87,11 +80,7 @@ def decode_model_weights(model):
     print("\nLoading decoder...")
     ini_time=time.time()
     decoder = deepCABAC.Decoder()
-<<<<<<< HEAD
     with open(weigths_path, 'rb') as f:
-=======
-    with open('weights/compressed_weights.bin', 'rb') as f:
->>>>>>> 1d10e518bcd816964a20c5021a8f88c760a9eff9
         stream = f.read()
     decoder.getStream(np.frombuffer(stream, dtype=np.uint8))
     state_dict = model.state_dict()
@@ -110,7 +99,6 @@ def decode_model_weights(model):
     print("Time taken to decode and load weights (s)->"+str(end_time))
     return model,end_time    
     
-<<<<<<< HEAD
 
 def save_result_row(batch_data, output, name, folder="outputs/",azure_run=None):
     """Will save a row with the different images rgb+depth+gt+output
@@ -177,8 +165,6 @@ def save_result_row(batch_data, output, name, folder="outputs/",azure_run=None):
     #print("saving img to "+str(folder+name))
 
    
-=======
->>>>>>> 1d10e518bcd816964a20c5021a8f88c760a9eff9
    
 def test_model(model,device,tag=" compressed "):
     print("\nLoading data to eval...")
@@ -210,7 +196,6 @@ def test_model(model,device,tag=" compressed "):
         psnr_list.append(current_psnr)
         loss = criterion(output, batch_data['gt']).item()
         loss_list.append(loss)
-<<<<<<< HEAD
         save_result_row(batch_data, output, "out_"+tag+str(i)+".png", folder="result_imgs/")
         
         
@@ -248,11 +233,3 @@ def compress_model_weights(path, params,save_route):
     print("Saving encoded model to (weights.bin)")
     with open(save_route, 'wb') as f:
         f.write(stream)
-=======
-    print("Mean loss"+tag+": "+str(sum(loss_list)/len(loss_list)))
-    print("Mean PSNR"+tag+ ": "+str(sum(psnr_list)/len(psnr_list)))
-    print(f'Loading time ({pre_time}) and inference time ({inf_time}) (s)')
-    #calculate loss
-    
-    #measure time
->>>>>>> 1d10e518bcd816964a20c5021a8f88c760a9eff9

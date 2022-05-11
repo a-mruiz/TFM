@@ -132,6 +132,73 @@ def conv3x3(in_channels, out_channels, stride=1, groups=1, dilation=1, bias=Fals
                      padding=padding, groups=groups, bias=True, dilation=dilation)
     init_weights(layer)
     return layer
+
+def deconv3x3_relu(in_channels, out_channels, kernel_size=3, stride=2, padding=2, output_padding=1, relu=True):
+    """Transpose convolution + BatchNorm + ReLU"""
+    if relu:
+        layers= nn.Sequential(
+            nn.ConvTranspose2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding, output_padding=output_padding, bias=False),
+            nn.ReLU(inplace=True)
+        )
+    else:
+        layers= nn.Sequential(
+            nn.ConvTranspose2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding, output_padding=output_padding, bias=True),
+        )
+    for m in layers.modules():
+        init_weights(m)
+    return layers
+
+
+class ResNetBlock(nn.Module):
+    """
+    This class represents a basic extraction block based on conv_layers + batchnorm + ReLU.
+    It is implemented following ResNet architecture
+    """
+    def __init__(self, in_channels, out_channels, stride=1,downsample=None,dilation=1,batch=True):
+        super(ResNetBlock, self).__init__()
+        self.batch=batch
+        #First extraction layer
+        #self.ext1=conv3x3_bn_relu(in_channels=in_channels, out_channels=out_channels, stride=stride)
+        self.conv1= conv3x3(in_channels, out_channels, stride,dilation=dilation)
+        self.bn1=nn.BatchNorm2d(out_channels)
+        #Second extraction layer
+        self.conv2 = conv3x3(out_channels, out_channels,dilation=dilation) #in_channels=out_channels
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        if stride != 1 or in_channels != out_channels:
+            if batch:
+                downsample = nn.Sequential(
+                    conv1x1(in_channels, out_channels, stride),
+                    nn.BatchNorm2d(out_channels),
+                )
+            else:
+                downsample = nn.Sequential(
+                conv1x1(in_channels, out_channels, stride),
+            )    
+            init_weights(downsample)
+        self.downsample = downsample
+        self.relu=nn.ReLU(inplace=True)
+        
+        init_weights(self.bn1)
+        init_weights(self.bn2)
+        
+        #self.relu=nn.SiLU(inplace=True)
+        
+    def forward(self, x):
+        #out=self.ext1(x)
+        out=self.conv1(x)
+        if self.batch:
+            out=self.bn1(out)
+        out=self.relu(out)
+        out=self.conv2(out)
+        if self.batch:
+            out=self.bn2(out)
+        if self.downsample is not None:
+            x = self.downsample(x)
+        out+=x
+        out=self.relu(out)
+        return out
+
+
 ###############################CBAM#################################
 
 class BasicConv(nn.Module):

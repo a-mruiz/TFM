@@ -97,11 +97,6 @@ with open('config_blob.json') as json_file:
     config_blob = json.load(json_file)
 
 
-#*############################
-# * USE ENVIRONMENT TO RUN
-# * A SCRIPT AS AN EXPERIMENT IN
-# * A COMPUTE CLUSTER
-# *
 
 # Create a script config (Uses docker to host environment)
 # Using 'as_download' causes the files in the file dataset to be downloaded to
@@ -110,26 +105,11 @@ with open('config_blob.json') as json_file:
 script_config = ScriptRunConfig(source_directory=experiment_folder,
                                 script="Depth_inpainting/main_train_new.py",
                                 arguments=[dataset_input,use_dataAug,config_blob["AZURE_STORAGE_CONNECTION_STRING"]],
-                                #arguments=['--gt-data', gt_ds.as_named_input('gtMaps_data').as_download(),
-                                #           '--preProcessed-data', preProcessed_ds.as_named_input(
-                                #               'preProcessed_data').as_download(),
-                                #           '--patients_list_train', patients_list_train,
-                                #           '--patient_test', patient_test,
-                                #           '--batch_dim', batch_dim,
-                                #           '--epochs', epochs,
-                                #           '--batch_size', batch_size,
-                                #           '--patch_size', patch_size,
-                                #           '--k_folds', k_folds,
-                                #           '--learning_rate', lr,
-                                #           '--model_name', model_name
-                                #           ],
                                 environment=pytorch_env, 
                                 compute_target=compute_instance_name
                                 )
 
-#*################################
-# * SUBMIT THE EXPERIMENT TO AZURE
-# *
+
 # submit the experiment
 experiment = Experiment(workspace=ws, name="Experiment_1")
 run = experiment.submit(config=script_config)

@@ -1,12 +1,12 @@
+#TODO list->
 #Descargar pesos----------------|||||-----> Check
-#Cargar modelo------------------|||||-----> 
-#descomprimir pesos-------------|||||----->
-#Cargar pesos al modelo---------|||||----->
-#inferencia---------------------|||||----->
+#Cargar modelo------------------|||||-----> Check
+#descomprimir pesos-------------|||||-----> Check
+#Cargar pesos al modelo---------|||||-----> Check
+#inferencia---------------------|||||-----> Check
 
 
 import json
-from json.tool import main
 import helper
 from model import models 
 import time
@@ -22,7 +22,6 @@ if cuda:
 else:
     device = torch.device("cpu")
 print("===> Using '{}' for computation.".format(device))
-
 
 
 

@@ -52,7 +52,7 @@ items = json.dumps(items)
 #Create the requets to the server
 
 endpoint="http://127.0.0.1:5001/score"
-
+endpoint="https://tfm-endpoint.westeurope.inference.ml.azure.com/score"
 
 newHeaders = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 print(f"Sending request to {endpoint}...")

@@ -30,3 +30,4 @@ __pycache__/
 #ignore Azure test folder
 Test_azure_training/Depth_inpainting/
 Azure_scripts/config_blob.json
+Edge/weights/weights_deep.pt

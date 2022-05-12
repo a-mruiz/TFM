@@ -128,7 +128,7 @@ def get_paths(train_or_test, root_path_raytune=None,mount=None):
 
 
 class MiddleburyDataLoader(data.Dataset):
-    def __init__(self, train_or_test, augment=True, preprocess_depth=False, root_path=None,h=800,w=800,mount=None):
+    def __init__(self, train_or_test, augment=True, preprocess_depth=False, root_path=None,h=1024,w=1024,mount=None):
         """Inits the MiddleburyDataLoader dataloader
 
         Args:

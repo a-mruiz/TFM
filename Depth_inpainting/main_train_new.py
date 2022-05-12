@@ -95,7 +95,7 @@ def main():
     lr = 0.0001
     weight_decay = 1e-07
     #weight_decay = 0
-    epochs = 30
+    epochs = 1
     params = {"mode": train_or_test, "lr": lr,
               "weight_decay": weight_decay, "epochs": epochs,
               "bs":1}
@@ -103,7 +103,8 @@ def main():
     """#1. Load the model"""
     print("===> Loading model...")
     model_loading_time = time.time()
-    model = models.InceptionAndAttentionModel_3CBAM()
+    model = models.InceptionAndAttentionModel_3CBAM().to(device)
+    model_untrained=copy.deepcopy(model)
     model_option = "InceptionAndAttentionModel_3CBAM"
     params['model']=model_option
     
@@ -274,7 +275,7 @@ def main():
             
             run.log("Time to connect to blob and upload model uncompressed (s)",blob_config_and_load_time)
                         
-            compression.compress_model("model_best.pt",azure_run=run)
+            compression.compress_model(model_untrained,"model_best.pt",azure_run=run)
             
             blob_client = blob_service_client.get_blob_client(container=container_name, blob="model_best_compressed.bin")
 
@@ -284,6 +285,8 @@ def main():
             
             run.complete()
 
+        
+        
     elif train_or_test == "test":
         avg_loss = test_model(model, test_dataloader,
                               criterion, logger, device)

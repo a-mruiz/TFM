@@ -98,10 +98,8 @@ with open('config_blob.json') as json_file:
 
 
 
-# Create a script config (Uses docker to host environment)
-# Using 'as_download' causes the files in the file dataset to be downloaded to
-# a temporary location on the compute where the script is being run.
-# Reference to datasets and the paths where they will be downloaded in the environment
+# Creates the configuration script that will manage environment, compute-instance and pass variables to
+# the training script
 script_config = ScriptRunConfig(source_directory=experiment_folder,
                                 script="Depth_inpainting/main_train_new.py",
                                 arguments=[dataset_input,use_dataAug,config_blob["AZURE_STORAGE_CONNECTION_STRING"]],

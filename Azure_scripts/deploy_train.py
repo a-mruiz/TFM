@@ -105,6 +105,11 @@ with open('config_blob.json') as json_file:
 script_config = ScriptRunConfig(source_directory=experiment_folder,
                                 script="Depth_inpainting/main_train_new.py",
                                 arguments=[dataset_input,use_dataAug,config_blob["AZURE_STORAGE_CONNECTION_STRING"]],
+                                #arguments=[
+                                #  '--dataset_input',dataset_input,
+                                #  '--dataAug',use_dataAug,
+                                #  '--az_blob_conn_str', config_blob["AZURE_STORAGE_CONNECTION_STRING"] 
+                                #],
                                 environment=pytorch_env, 
                                 compute_target=compute_instance_name
                                 )

@@ -29,7 +29,7 @@ from helpers import compression
 # Import Azure SKD for Python packages
 from azureml.core import Run
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
-
+import argparse 
 
 sys.path.append("/media/beegfs/home/t588/t588188/.local/lib/python3.9/site-packages") 
 
@@ -44,6 +44,15 @@ if cuda:
 else:
     device = torch.device("cpu")
 print("===> Using '{}' for computation.".format(device))
+
+
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--dataset_input',type=str, help="The route of the dataset model created in Azure Machine Learning Studio")
+# parser.add_argument('--no_data_aug',help="Specify this argument to disable data augmentaiton in training",action='store_false')
+# parser.add_argument('--az_blob_conn_str',type=str, help="The connection string to connect to Azure Blob Storage")
+# args = parser.parse_args()
+
+
 
 
 try:
@@ -94,8 +103,8 @@ def main():
     """#1. Load the model"""
     print("===> Loading model...")
     model_loading_time = time.time()
-    model = models.SelfAttentionCBAM()
-    model_option = "SelfAttentionCBAM"
+    model = models.InceptionAndAttentionModel_3CBAM()
+    model_option = "InceptionAndAttentionModel_3CBAM"
     params['model']=model_option
     
     writer = SummaryWriter(log_dir="runs/FAILED/",comment=f'')

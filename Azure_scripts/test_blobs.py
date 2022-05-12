@@ -1,13 +1,14 @@
 import os, uuid
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
-
+import json
 try:
     print("Azure Blob Storage v" + __version__ + " - Python quickstart sample")
 
-    connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-    
+    #connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+    with open('config_blob.json') as json_file:
+        config_blob = json.load(json_file)
     # Create the BlobServiceClient object which will be used to create a container client
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    blob_service_client = BlobServiceClient.from_connection_string(config_blob["AZURE_STORAGE_CONNECTION_STRING"])
 
     # Create a unique name for the container
     container_name = "conteinertostoremodels"
@@ -37,8 +38,8 @@ try:
     blob_service_client.create_blob_from_path(
         container_name, local_file_name, full_path_to_file)
     """
-    blob_service_client.create_blob_from_path(
-        container_name, local_file_name, full_path_to_file)
+    #blob_service_client.create_blob_from_path(
+    #    container_name, local_file_name, full_path_to_file)
     
 except Exception as ex:
     print('Exception:')

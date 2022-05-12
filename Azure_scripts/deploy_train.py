@@ -19,7 +19,7 @@ import shutil
 # cli_auth = AzureCliAuthentication()
 
 
-use_dataAug=False
+use_dataAug=True
 
 # Experiment folder name
 experiment_folder = 'Test_azure_training'

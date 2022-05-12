@@ -7,7 +7,7 @@ import numpy as np
 from dataloaders.MiddleburyDataloaderFile import MiddleburyDataLoader
 import helpers.losses as losses
 
-def compress_model(model,weights_path,map_location=torch.device("cpu"),compressed_saving_path="weights.bin",azure_run=None,interv=0.1,stepsize=2**(-0.5*15),stepsize_other=2**(-0.5*19),_lambda=0.):
+def compress_model(model,weights_path,mount_point,map_location=torch.device("cpu"),compressed_saving_path="weights.bin",azure_run=None,interv=0.1,stepsize=2**(-0.5*15),stepsize_other=2**(-0.5*19),_lambda=0.):
     """Compress model using DeepCABAC to produce a binary file
 
     Args:
@@ -63,18 +63,18 @@ def compress_model(model,weights_path,map_location=torch.device("cpu"),compresse
         
     model_compressed,_=decode_model_weights(model)    
     
-    test_model_compressed(model_compressed,map_location,azure_run)
+    test_model_compressed(model_compressed,map_location,azure_run, mount_point)
 
 
 
-def test_model_compressed(model,device,azure_run):
+def test_model_compressed(model,device,azure_run,mount_point):
     
     print("\nLoading data to eval...")
     pre_time=time.time()
     model.eval()
     criterion = losses.CombinedNew()
     #loading data to test
-    dataset_test = MiddleburyDataLoader("test")
+    dataset_test = MiddleburyDataLoader("test",mount=mount_point)
     test_dataloader = torch.utils.data.DataLoader(
         dataset_test,
         batch_size=1,

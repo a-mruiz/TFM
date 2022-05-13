@@ -63,11 +63,11 @@ def compress_model(model,weights_path,mount_point,map_location=torch.device("cpu
         
     model_compressed,_=decode_model_weights(model)    
     
-    test_model_compressed(model_compressed,map_location,azure_run, mount_point)
+    test_model_compressed(model_compressed,azure_run, mount_point)
 
 
 
-def test_model_compressed(model,device,azure_run,mount_point):
+def test_model_compressed(model,azure_run,mount_point):
     
     print("\nLoading data to eval...")
     pre_time=time.time()
@@ -85,6 +85,15 @@ def test_model_compressed(model,device,azure_run,mount_point):
     psnr_list=[]
     loss_list=[]
     #inference
+    
+    cuda = torch.cuda.is_available()
+    if cuda:
+        import torch.backends.cudnn as cudnn
+        #cudnn.benchmark = True
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+          
     for i, batch_data in enumerate(test_dataloader):
         batch_data = {
             key: val.to(device) for key, val in batch_data.items() if val is not None

@@ -275,7 +275,7 @@ def main():
             
             run.log("Time to connect to blob and upload model uncompressed (s)",blob_config_and_load_time)
                         
-            compression.compress_model(model_untrained,"model_best.pt",azure_run=run)
+            compression.compress_model(model_untrained,"model_best.pt",azure_run=run,mount_point=mount_point)
             
             blob_client = blob_service_client.get_blob_client(container=container_name, blob="model_best_compressed.bin")
 

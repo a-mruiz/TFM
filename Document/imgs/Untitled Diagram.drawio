@@ -1,17 +1,53 @@
-<mxfile host="app.diagrams.net" modified="2022-06-10T10:28:18.634Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.99 Safari/537.36" etag="kkxYwd8MLKrxaz7ftMeN" version="19.0.3" type="github">
+<mxfile host="app.diagrams.net" modified="2022-06-10T10:35:00.881Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.99 Safari/537.36" etag="IClRRExtN87Brq73OFpN" version="19.0.3" type="github">
   <diagram id="BZHHlnQn6t2uy99b9ZWB" name="Page-1">
-    <mxGraphModel dx="1087" dy="623" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="906" dy="520" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="sdOlFE24iYeHtxYmCAVc-1" value="Connect with Azure" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="80" width="120" height="60" as="geometry" />
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-1" value="GitHub repository" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="350" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="sdOlFE24iYeHtxYmCAVc-2" value="Get reference to dataset" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="230" y="80" width="120" height="60" as="geometry" />
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-2" value="Connect to Azure" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="260" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="sdOlFE24iYeHtxYmCAVc-3" value="Get reference to dataset" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="400" y="80" width="120" height="60" as="geometry" />
+          <mxGeometry x="160" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-4" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.laptop;pointerEvents=1;" vertex="1" parent="1">
+          <mxGeometry x="355" y="470" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-5" value="Create Training environment" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="60" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-6" value="" style="sketch=0;aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Docker.svg;" vertex="1" parent="1">
+          <mxGeometry x="320" y="69.5" width="50" height="41" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-7" value="" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=2;strokeColor=#0080F0;shadow=0;dashed=0;shape=mxgraph.ios7.icons.data;" vertex="1" parent="1">
+          <mxGeometry x="250" y="190.9" width="24" height="29.099999999999998" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-8" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://logos-world.net/wp-content/uploads/2021/03/Azure-Logo-2020-present.png;" vertex="1" parent="1">
+          <mxGeometry x="232" y="286.19" width="60" height="33.81" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-9" value="" style="dashed=0;outlineConnect=0;html=1;align=center;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;shape=mxgraph.weblogos.github" vertex="1" parent="1">
+          <mxGeometry x="403" y="373" width="37" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-10" value="Compress model files" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-11" value="" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=2;strokeColor=#0080F0;shadow=0;dashed=0;shape=mxgraph.ios7.icons.data;" vertex="1" parent="1">
+          <mxGeometry x="570" y="190.9" width="24" height="29.099999999999998" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-12" value="Save models" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-13" value="" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=2;strokeColor=#0080F0;shadow=0;dashed=0;shape=mxgraph.ios7.icons.data;" vertex="1" parent="1">
+          <mxGeometry x="570" y="290.9" width="24" height="29.099999999999998" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-14" value="Perform training" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="60" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sdOlFE24iYeHtxYmCAVc-16" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.armadilloamarillo.com/wp-content/uploads/pytorch-logo.png;" vertex="1" parent="1">
+          <mxGeometry x="465" y="65" width="55" height="55" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

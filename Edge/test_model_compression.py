@@ -24,15 +24,15 @@ compression_params={
 
 
 model=models.BasicModelDeep().to(device)
+model=models.Pix2PixGanGenerator().to(device)
+
+helper.compress_model_weights("weights/generator.pt",compression_params,"weights/generator.bin")
 
 
-helper.compress_model_weights("weights/weights_deep.pt",compression_params,"weights/weights_deep.bin")
-
-
-model_compressed,_=helper.decode_model_weights(model,'weights/weights_deep.bin')    
+model_compressed,_=helper.decode_model_weights(model,'weights/generator.bin')    
 
 helper.test_model(model_compressed,device)
-model.load_state_dict(torch.load("weights/weights_deep.pt", map_location=device))
+model.load_state_dict(torch.load("weights/generator.pt", map_location=device))
 helper.test_model(model,device," normal ")
 
 

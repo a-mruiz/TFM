@@ -27,6 +27,11 @@ def compress_model(model,weights_path,mount_point,map_location=torch.device("cpu
     enc_time=time.time()
     
     
+    stepsize=2**(-0.5*10)
+    
+    
+    
+    
     for name, param in tqdm(weights.items()):
         if '.num_batches_tracked' in name:
             continue
@@ -62,13 +67,21 @@ def compress_model(model,weights_path,mount_point,map_location=torch.device("cpu
         f.write(stream)
         
     model_compressed,_=decode_model_weights(model)    
-    
-    test_model_compressed(model_compressed,azure_run, mount_point)
+    model.load_state_dict(torch.load("model_best.pt"))
+    test_model_compressed_and_uncompressed(model_compressed,model,azure_run, mount_point)
 
 
 
-def test_model_compressed(model,azure_run,mount_point):
-    
+def test_model_compressed_and_uncompressed(model_compressed,model,azure_run,mount_point):
+    """It will test the model compressed and uncompressed versions and upload the PSNR and loss to 
+        azure. This way the impact of the compression over the model is known and registered.
+
+    Args:
+        model_compressed (PytorchModel): compressed model
+        model (_type_): normal model
+        azure_run (_type_): azure run to log values
+        mount_point (_type_): mount point for the dataset
+    """
     print("\nLoading data to eval...")
     pre_time=time.time()
     model.eval()
@@ -82,8 +95,7 @@ def test_model_compressed(model,azure_run,mount_point):
         num_workers=6,
         pin_memory=True,
         sampler=None)
-    psnr_list=[]
-    loss_list=[]
+
     #inference
     
     cuda = torch.cuda.is_available()
@@ -93,7 +105,30 @@ def test_model_compressed(model,azure_run,mount_point):
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
+    
+    psnr_list=[]
+    loss_list=[]
           
+    for i, batch_data in enumerate(test_dataloader):
+        batch_data = {
+            key: val.to(device) for key, val in batch_data.items() if val is not None
+        }
+        pre_time=time.time()-pre_time
+        inf_time=time.time()
+        output = model_compressed(batch_data)
+        inf_time=time.time()-inf_time
+        current_psnr = -losses.psnr_loss(output, batch_data['gt']).item()
+        psnr_list.append(current_psnr)
+        loss = criterion(output, batch_data['gt']).item()
+        loss_list.append(loss)
+        #save_result_row(batch_data, output, "out_"+tag+str(i)+".png", folder="result_imgs/")
+        
+    azure_run.log('LAST Loss Model Compressed',  sum(loss_list)/len(loss_list))
+    azure_run.log('LAST PSNR Model Compressed',  sum(psnr_list)/len(psnr_list))
+    
+    psnr_list=[]
+    loss_list=[]
+    
     for i, batch_data in enumerate(test_dataloader):
         batch_data = {
             key: val.to(device) for key, val in batch_data.items() if val is not None
@@ -108,8 +143,8 @@ def test_model_compressed(model,azure_run,mount_point):
         loss_list.append(loss)
         #save_result_row(batch_data, output, "out_"+tag+str(i)+".png", folder="result_imgs/")
         
-    azure_run.log('LAST Loss Model Compressed',  sum(loss_list)/len(loss_list))
-    azure_run.log('LAST PSNR Model Compressed',  sum(psnr_list)/len(psnr_list))
+    azure_run.log('LAST Loss Model Uncompressed',  sum(loss_list)/len(loss_list))
+    azure_run.log('LAST PSNR Model Uncompressed',  sum(psnr_list)/len(psnr_list))
        
     #print("Mean loss"+tag+": "+str(sum(loss_list)/len(loss_list)))
     #print("Mean PSNR"+tag+ ": "+str(sum(psnr_list)/len(psnr_list)))
